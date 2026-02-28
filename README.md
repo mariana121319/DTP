@@ -92,19 +92,3 @@ Si un puerto de usuario permite negociación de trunk, se puede degradar la segm
 - [ ] Inter-VLAN routing funciona según la política definida.
 
 ---
-
-## 8) Parámetros del laboratorio (rellenar)
-
-- Trunk SW1 (puerto): __________
-- VLAN nativa: __________
-- DHCP lo provee: (R1/Server) __________
-- DNS (si aplica): __________
-- Dominio (si aplica): mariana.local
-
----
-
-## 9) Espacio para subir un .py
-
-- **Archivo:** `Dtp.py`
-- **Ruta:** `./Dtp.py`
-- **Notas:** (descripción conceptual, sin instrucciones operativas) ____________________
