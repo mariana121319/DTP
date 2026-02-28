@@ -1,10 +1,5 @@
 # Informe (Defensivo): Riesgo por Negociación DTP / Trunk no autorizado
 
-**Fecha:** 2026-02-28 04:17:35  
-**Autor:** mariana121319  
-**Entorno:** PNetLab (laboratorio)  
-**Dominio/LAN (opcional):** `mariana.local`
-
 ---
 
 ## 1) Objetivo del laboratorio (enfoque defensivo)
@@ -24,20 +19,13 @@
 - **R1**: Router-on-a-stick (subinterfaces en `f0/0`)
 - **SW1**: Switch L2 (VLAN 10/20/30)
 - **Hosts**
-  - VLAN 10: PC1, PC2
-  - VLAN 20: Server
-  - VLAN 30: Admin PC
-
-### Interfaces / Puertos (rellenar)
-- **Trunk**: `R1 f0/0` ↔ `SW1 __________`
-- **Access ports**
-  - PC1 ↔ `SW1 __________`
-  - PC2 ↔ `SW1 __________`
-  - Server ↔ `SW1 __________`
-  - Admin PC ↔ `SW1 __________`
+  - VLAN 10: Linux, Windows
+  - VLAN 20: --
+  - VLAN 30: Server
 
 **Captura/diagrama de topología:**  
-(PEGA AQUÍ LA IMAGEN)
+
+<img width="886" height="514" alt="image" src="https://github.com/user-attachments/assets/fddaf3e4-e973-4b2e-a6ca-a4c3f73b48bc" />
 
 ---
 
@@ -69,10 +57,9 @@
 
 ## 4) Evidencias (capturas)
 
-- [ ] Estado de trunks (antes/después): ______________________
-- [ ] VLANs y puertos asignados: _____________________________
-- [ ] Config final de puertos de usuario (access): ___________
-- [ ] (Opcional) Logs/Syslog: ________________________________
+<img width="886" height="565" alt="image" src="https://github.com/user-attachments/assets/8c371f92-9998-40a5-a4ac-7838ddb1de41" />
+
+<img width="886" height="677" alt="image" src="https://github.com/user-attachments/assets/47bf47fd-2ddc-45f4-ba07-6b3f1f00e387" />
 
 ---
 
