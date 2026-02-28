@@ -1,112 +1,123 @@
-# MitM Lab: ARP & DNS Spoofing — Documentación Técnica
+# Informe (Defensivo): Riesgo por Negociación DTP / Trunk no autorizado
 
-## 1. Aviso legal y ética profesional
-Este documento describe un laboratorio controlado con fines educativos y defensivos. La información incluida está destinada únicamente para:
+**Fecha:** 2026-02-28 04:17:35  
+**Autor:** mariana121319  
+**Entorno:** PNetLab (laboratorio)  
+**Dominio/LAN (opcional):** `mariana.local`
 
-- Evaluación de vulnerabilidades en entornos controlados.
-- Análisis de mitigaciones y prácticas de seguridad.
-- Formación en detección de ataques de suplantación ARP y DNS.
+---
 
-**Importante:** El uso de técnicas de interceptación o manipulación de tráfico en entornos no autorizados es ilegal y queda fuera del alcance de este documento.
+## 1) Objetivo del laboratorio (enfoque defensivo)
 
-## 2. Objetivo del laboratorio
-El laboratorio tiene como finalidad:
+- Documentar el **riesgo** de permitir **negociación dinámica de trunk** en puertos que deberían ser de acceso.
+- Describir la **topología**, **VLANs** y **direccionamiento IP**.
+- Incluir **evidencias** (capturas) y un checklist de **verificación**.
+- Proponer **medidas de mitigación** y buenas prácticas de hardening.
 
-- Comprender los riesgos asociados con suplantación ARP (ARP spoofing/poisoning) en redes de capa 2.
-- Analizar el impacto de la manipulación de resolución DNS (DNS spoofing/hijacking).
-- Implementar controles para prevenir, detectar y mitigar estos ataques.
+> Este README es **defensivo**: describe prevención/detección/verificación, no una guía operativa de explotación.
 
-**Nota:** Este documento se enfoca en aspectos defensivos y de análisis; no incluye procedimientos ofensivos.
+---
 
-## 3. Alcance
-- **Entorno:** Laboratorio virtual con hosts aislados (PNetLab, EVE-NG, GNS3).
-- **Capas afectadas:** L2 (ARP), L3/L4 (UDP/53), y aplicación (DNS).
-- **Resultados esperados:** Identificación de indicadores de compromiso (IoC) y validación de mitigaciones.
+## 2) Topología (completar con tus puertos)
 
-## 4. Topología del laboratorio
+### Dispositivos
+- **R1**: Router-on-a-stick (subinterfaces en `f0/0`)
+- **SW1**: Switch L2 (VLAN 10/20/30)
+- **Hosts**
+  - VLAN 10: PC1, PC2
+  - VLAN 20: Server
+  - VLAN 30: Admin PC
 
-### 4.1 Componentes
-- **Host víctima (Target/Cliente):** Genera consultas DNS.
-- **Gateway:** Router de salida de VLAN.
-- **Servidor DNS:** Resolvedor interno o externo, según diseño.
-- **Host de pruebas (nodo de validación):** Nodo de laboratorio para simular comportamiento malicioso y validar controles.
+### Interfaces / Puertos (rellenar)
+- **Trunk**: `R1 f0/0` ↔ `SW1 __________`
+- **Access ports**
+  - PC1 ↔ `SW1 __________`
+  - PC2 ↔ `SW1 __________`
+  - Server ↔ `SW1 __________`
+  - Admin PC ↔ `SW1 __________`
 
-### 4.2 Interfaces, VLANs y direccionamiento
-| Nodo | Interfaz | VLAN | IP | Rol |
-|------|----------|------|----|-----|
-| Victim (Target) | eth1 | 10 | 12.0.10.20/24 | Cliente |
-| Gateway | ethX | 10 | 12.0.10.1/24 | Gateway |
-| Nodo de pruebas | ethZ | 10 | 12.0.10.10/24 | Nodo de validación |
+**Captura/diagrama de topología:**  
+(PEGA AQUÍ LA IMAGEN)
 
-> Sustituir los valores según el entorno de laboratorio real.
+---
 
-## 5. Parámetros del escenario
-- **NIC de captura/monitoreo:** Interfaz conectada a la VLAN del cliente.
-- **IP de redirección de prueba:** 12.0.10.10/24.
-- **DNS Resolver:** **N/A** si no existe, o indicar IP del resolver interno.
+## 3) VLANs y direccionamiento IP (definido)
 
-## 6. Requisitos del laboratorio
+### 🌐 VLAN 10
+- **Red:** `12.0.10.0/24`
+- **Gateway (R1 f0/0.10):** `12.0.10.1`
+- **Rango DHCP:** `12.0.10.11 – 12.0.10.254`
+- **Ejemplos de hosts:**
+  - PC1 → `12.0.10.11`
+  - PC2 → `12.0.10.12`
 
-### 6.1 Requisitos de red
-- VLAN aislada, sin conexión a redes productivas.
-- Disponibilidad de SPAN o port-mirroring para observación de tráfico.
-- DNS controlado mediante resolvedor interno o sinkhole de laboratorio.
+### 🌐 VLAN 20
+- **Red:** `12.0.20.0/24`
+- **Gateway (R1 f0/0.20):** `12.0.20.1`
+- **Rango DHCP:** `12.0.20.11 – 12.0.20.254`
+- **Ejemplo:**
+  - Server → `12.0.20.11`
 
-### 6.2 Requisitos de monitoreo
-- **Captura de tráfico:** Wireshark o tcpdump.
-- **Logs relevantes:**
-  - Switch: DAI, DHCP snooping, port security.
-  - Firewall/Router: conntrack, DNS logs.
-  - DNS resolver: consultas/respuestas, TTLs, respuestas NXDOMAIN.
+### 🌐 VLAN 30
+- **Red:** `12.0.30.0/24`
+- **Gateway (R1 f0/0.30):** `12.0.30.1`
+- **Rango DHCP:** `12.0.30.11 – 12.0.30.254`
+- **Ejemplo:**
+  - Admin PC → `12.0.30.11`
 
-## 7. Evidencias requeridas
-Se deben incluir capturas de pantalla con datos redactados:
+---
 
-- Tabla ARP antes y después (host víctima y gateway).
-- Tráfico DNS (consulta y respuesta) en Wireshark.
-- Alertas y logs de mitigación (DAI/DHCP snooping) o IDS (Suricata/Snort).
-- Validación de resolución DNS (dig/nslookup) mostrando comportamiento correcto tras mitigación.
+## 4) Evidencias (capturas)
 
-Estructura de archivos sugerida:
+- [ ] Estado de trunks (antes/después): ______________________
+- [ ] VLANs y puertos asignados: _____________________________
+- [ ] Config final de puertos de usuario (access): ___________
+- [ ] (Opcional) Logs/Syslog: ________________________________
 
-- `docs/screenshots/01_arp_table_before.png`
-- `docs/screenshots/02_arp_table_after.png`
-- `docs/screenshots/03_dns_query_response.png`
-- `docs/screenshots/04_mitigation_logs.png`
+---
 
-## 8. Indicadores de compromiso (IoC)
+## 5) Riesgo (resumen)
 
-### 8.1 ARP Spoofing
-- Cambios frecuentes en entradas ARP (IP del gateway con MAC distinta).
-- Paquetes ARP “gratuitos” repetitivos.
-- Incremento de ARP replies sin solicitudes previas.
+Si un puerto de usuario permite negociación de trunk, se puede degradar la segmentación por VLAN y aumentar el riesgo de exposición de tráfico y movimiento lateral, dependiendo de la configuración del entorno.
 
-### 8.2 DNS Spoofing/Hijacking
-- TTLs inusuales o inconsistentes.
-- Direcciones IP inesperadas para dominios conocidos.
-- Respuestas “authoritative” anómalas.
-- Divergencia entre resolver esperado y respuestas observadas.
+---
 
-## 9. Medidas de mitigación recomendadas
+## 6) Medidas de mitigación (recomendadas)
 
-### 9.1 Capa 2 (ARP)
-- Dynamic ARP Inspection (DAI) en switches gestionables.
-- DHCP Snooping con tabla de bindings para validar ARP.
-- Port Security (máximo de MAC por puerto, sticky MAC).
-- Segmentación de VLAN y reducción del dominio de broadcast.
-- Configuración de ARP estático en dispositivos críticos.
+- Puertos de usuario en **access fijo**, con VLAN explícita y sin negociación.
+- Enlace SW1–R1 como trunk **controlado** y con **VLANs permitidas mínimas** (solo 10/20/30).
+- VLAN nativa dedicada y documentada (evitar VLAN 1 si es posible).
+- Port-security / 802.1X (si aplica).
+- DHCP Snooping + DAI + IP Source Guard (si aplica).
+- ACLs inter-VLAN según rol (usuarios vs admin) si necesitas segmentación adicional.
 
-### 9.2 Capa 3/Aplicación (DNS)
-- Forzar uso de DNS interno y bloquear UDP/53 no autorizado.
-- Implementar DNSSEC en el resolvedor.
-- Uso de DoT/DoH gestionado para proteger integridad/confidencialidad entre cliente y resolver.
-- “DNS sinkhole” para dominios maliciosos.
+---
 
-### 9.3 Observabilidad y respuesta
-- IDS/IPS (Suricata/Snort) con reglas para anomalías ARP y DNS spoofing.
-- Alertas por cambios de MAC del gateway.
-- Procedimiento de respuesta: aislar puerto, limpiar tablas ARP y rotar credenciales afectadas.
+## 7) Verificación (checklist)
 
-## 10. Limitaciones
-- Reproducibilidad depende de la virtualización y capacidad del entorno de laboratorio.
-- Algunos entornos virtuales no emulan completamente DAI o DHCP snooping.
+- [ ] Solo el enlace SW1–R1 está en trunk.
+- [ ] Los puertos de hosts están en access y en su VLAN correcta.
+- [ ] El trunk permite únicamente VLAN 10/20/30.
+- [ ] DHCP entrega IPs correctas:
+  - VLAN10 → 12.0.10.0/24
+  - VLAN20 → 12.0.20.0/24
+  - VLAN30 → 12.0.30.0/24
+- [ ] Inter-VLAN routing funciona según la política definida.
+
+---
+
+## 8) Parámetros del laboratorio (rellenar)
+
+- Trunk SW1 (puerto): __________
+- VLAN nativa: __________
+- DHCP lo provee: (R1/Server) __________
+- DNS (si aplica): __________
+- Dominio (si aplica): mariana.local
+
+---
+
+## 9) Espacio para subir un .py
+
+- **Archivo:** `Dtp.py`
+- **Ruta:** `./Dtp.py`
+- **Notas:** (descripción conceptual, sin instrucciones operativas) ____________________
