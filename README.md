@@ -1,21 +1,30 @@
-# DTP Documentation
+# Informe Defensivo en Español
 
-## Mitigating Factors and Topology
+## Objetivo
+El objetivo de este informe es proporcionar una evaluación detallada del entorno de seguridad y las prácticas defensivas en la red.
 
-Content from Informe_DTP_Mitigacion_y_Topologia.md goes here.
+## Topología
+La topología de la red está compuesta por múltiples segmentos de red conectados mediante switches y routers, cada uno desempeñando un papel crucial en el flujo de datos.
 
-## Dtp.py
+## VLAN 10/20/30 Addressing
+- **VLAN 10**: Direccionamiento para usuarios administrativos.
+- **VLAN 20**: Direccionamiento para invitados.
+- **VLAN 30**: Direccionamiento para servidores de bases de datos.
 
-### Overview
+## Evidencias
+Se presentan diversas evidencias en forma de registros y capturas de pantalla que demuestran la seguridad de la red.
 
-In this section, we will attach the Dtp.py file, which plays a crucial role in our workflow and implements essential functionalities with a defensive coding approach.
+## Mitigación
+Se han implementado varias estrategias de mitigación para reducir riesgos, incluidas actualizaciones de firmware y formación del personal.
 
-### Defensive Coding Practices
+## Verificación
+La verificación de los sistemas se lleva a cabo mediante auditorías regulares y pruebas de penetración.
 
-1. **Input Validation**: Validate all inputs to the functions to prevent errors and exceptions.
-2. **Error Handling**: Implement try-except blocks to gracefully handle unexpected situations.
-3. **Code Readability**: Ensure that code is easy to read and well-commented.
+## Parámetros
+Se han establecido parámetros claros para la supervisión del rendimiento y la seguridad de la red.
 
-### Conclusion
+## Espacio para subir el .py
+[Incluir aquí el archivo Python relevante].
 
-The combination of these practices not only ensures reliability but also enhances the maintainability of the code.
+## Conclusiones
+La revisión de defensa y seguridad ha demostrado ser efectiva y se sugiere seguir con esta práctica regularmente.
