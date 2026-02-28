@@ -1,9 +1,8 @@
-# DTP Python Module
-
-# Add your code here
+# Placeholder: pega aquí tu script .py cuando quieras subirlo al repo.
+# (Este archivo queda como “espacio” reservado.)
 
 def main():
-    print('Hello, DTP!')
+    print("Dtp.py placeholder")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
